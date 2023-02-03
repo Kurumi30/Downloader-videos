@@ -22,7 +22,7 @@ const readline = rl.createInterface({
     output: process.stdout
 })
 
-async function main(videoURL) {
+async function main() {
     show()
 
     console.log(`
@@ -42,8 +42,8 @@ async function main(videoURL) {
 
                 readline.question(`
                 URL do vídeo: `, async (video) => {
-                    const data = await ytdl.getInfo(video).catch(error => {
-                        console.log("Ops, deu um erro: ", error)
+                    const data = await ytdl.getInfo(video).catch(() => {
+                        console.log("URL inválida, tente novamente!")
 
                         setTimeout(() => {
                             readline.close()
@@ -148,7 +148,7 @@ async function main(videoURL) {
 
             default: {
                 readline.close()
-                main()
+                // main()
             }
         }
     }))
