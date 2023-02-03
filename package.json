@@ -1,0 +1,21 @@
+{
+  "name": "yt-download",
+  "version": "1.0.0",
+  "description": "download de videos do youtube",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js",
+    "start": "node ."
+  },
+  "keywords": [
+    "javascript",
+    "nodejs"
+  ],
+  "author": "Kurumi30",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^3.3.0",
+    "ytdl-core": "^4.11.2"
+  }
+}
