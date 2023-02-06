@@ -12,7 +12,7 @@ __     _________   _____                      _                 _
 
 `
 
-const show = () => {
+const banner = () => {
     console.clear()
     console.log(logo)
 }
@@ -23,7 +23,7 @@ const readline = rl.createInterface({
 })
 
 async function main() {
-    show()
+    banner()
 
     console.log(`
     Escolha uma opção abaixo:
@@ -36,62 +36,64 @@ async function main() {
     Opção selecionada: `, (option => {
         switch (Number(option)) {
             case 1: {
-                console.clear()
-
-                console.log(logo)
+                banner()
 
                 readline.question(`
-                URL do vídeo: `, async (video) => {
+    URL do vídeo: `, async (video) => {
                     const data = await ytdl.getInfo(video).catch(() => {
-                        console.log("URL inválida, tente novamente!")
+
+                        if(!video) return console.log("URL inválida, tente novamente!")
 
                         setTimeout(() => {
                             readline.close()
-
                             main()
                         }, 6000)
                     })
-                    show()
+                    banner()
+
+                    const title = data.videoDetails.title
+                    const lengthSeconds = data.videoDetails.lengthSeconds
 
                     readline.question(`
-                    Vídeo: "${data.videoDetails.title}"
+    Vídeo: "${title}"
+    Duração: ${lengthSeconds} segundos
 
-                    Salvar como:
+    Salvar como:
 
-                    [1] - MP4
-                    [2] - MP3
+    [1] - MP4
+    [2] - MP3
 
-                    Opção selecionada: `, option => {
+    Opção selecionada: `, option => {
                         switch (Number(option)) {
                             case 1: {
                                 ytdl(video)
                                     .on("progress", (total, downloadedSize, totalSize) => {
                                         let progress = (downloadedSize / totalSize) * 100
 
-                                        show()
+                                        banner()
 
                                         console.log(`
-                                    Baixando... [ ${progress.toFixed(2)}% ]
+    Baixando... [ ${progress.toFixed(2)}% ]
                                     `)
                                     })
                                     .on("error", (e => {
-                                        show()
+                                        banner()
 
-                                        fs.unlinkSync(`./videos/${data.videoDetails.title.replace(
+                                        fs.unlinkSync(`./videos/${title.replace(
                                             new RegExp('\\\\|/|\\|', 'g'), '-'
                                         )}.mp4`)
 
                                         console.log("Houve um erro ao tentar baixar o arquivo... :(")
                                     }))
                                     .on("end", () => {
-                                        show()
+                                        banner()
 
                                         console.log("O vídeo foi baixado com sucesso! :)")
 
                                         readline.close()
                                     })
                                     .pipe(
-                                        fs.createWriteStream(`./videos/${data.videoDetails.title.replace(
+                                        fs.createWriteStream(`./videos/${title.replace(
                                             new RegExp('\\\\|/|\\|', 'g'), '-'
                                         )}.mp4`)
                                     )
@@ -106,30 +108,30 @@ async function main() {
                                     .on("progress", (total, downloadedSize, totalSize) => {
                                         let progress = (downloadedSize / totalSize) * 100
 
-                                        show()
+                                        banner()
 
                                         console.log(`
-                                    Baixando... [ ${progress.toFixed(2)}% ]
+    Baixando... [ ${progress.toFixed(2)}% ]
                                     `)
                                     })
                                     .on("error", (e => {
-                                        show()
+                                        banner()
 
-                                        fs.unlinkSync(`./audios/${data.videoDetails.title.replace(
+                                        fs.unlinkSync(`./audios/${title.replace(
                                             new RegExp('\\\\|/|\\|', 'g'), '-'
                                         )}.mp4`)
 
                                         console.log("Houve um erro ao tentar baixar o arquivo... :(")
                                     }))
                                     .on("end", () => {
-                                        show()
+                                        banner()
 
                                         console.log("O áudio foi baixado com sucesso! :)")
 
                                         readline.close()
                                     })
                                     .pipe(
-                                        fs.createWriteStream(`./audios/${data.videoDetails.title.replace(
+                                        fs.createWriteStream(`./audios/${title.replace(
                                             new RegExp('\\\\|/|\\|', 'g'), '-'
                                         )}.mp3`)
                                     )
