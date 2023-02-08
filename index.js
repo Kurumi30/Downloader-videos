@@ -1,6 +1,7 @@
 import fs from 'fs'
 import ytdl from 'ytdl-core'
 import rl from 'readline'
+import chalk from 'chalk'
 
 const logo = `
 __     _________   _____                      _                 _ 
@@ -15,6 +16,10 @@ __     _________   _____                      _                 _
 const banner = () => {
     console.clear()
     console.log(logo)
+}
+
+function colorTheme(text) {
+    const log = chalk.rgb(123, 45, 67).bold(text)
 }
 
 const readline = rl.createInterface({
@@ -42,8 +47,6 @@ async function main() {
     URL do vídeo: `, async (video) => {
                     const data = await ytdl.getInfo(video).catch(() => {
 
-                        if(!video) return console.log("URL inválida, tente novamente!")
-
                         setTimeout(() => {
                             readline.close()
                             main()
@@ -53,6 +56,8 @@ async function main() {
 
                     const title = data.videoDetails.title
                     const lengthSeconds = data.videoDetails.lengthSeconds
+
+                    if (videoDetails == undefined) return console.log("URL inválida, tente novamente!")
 
                     readline.question(`
     Vídeo: "${title}"
@@ -66,7 +71,10 @@ async function main() {
     Opção selecionada: `, option => {
                         switch (Number(option)) {
                             case 1: {
-                                ytdl(video)
+                                ytdl(video, {
+                                    quality: 'highestvideo',
+                                    format: 'mp4'
+                                })
                                     .on("progress", (total, downloadedSize, totalSize) => {
                                         let progress = (downloadedSize / totalSize) * 100
 
@@ -103,6 +111,7 @@ async function main() {
                             case 2: {
                                 ytdl(video, {
                                     filter: 'audioonly',
+                                    quality: 'highestaudio',
                                     format: 'mp3'
                                 })
                                     .on("progress", (total, downloadedSize, totalSize) => {

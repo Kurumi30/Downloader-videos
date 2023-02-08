@@ -15,6 +15,7 @@
   "author": "Kurumi30",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^5.2.0",
     "node-fetch": "^3.3.0",
     "ytdl-core": "^4.11.2"
   }
