@@ -30,7 +30,6 @@ async function main() {
     clearScreen()
     displayLogo()
 
-
     console.log(colorTheme(
         `Escolha uma opção abaixo:
 
