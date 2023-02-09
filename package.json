@@ -1,7 +1,7 @@
 {
   "name": "yt-download",
   "version": "1.0.0",
-  "description": "download de videos do youtube",
+  "description": "download de videos de diversas redes sociais",
   "type": "module",
   "main": "index.js",
   "scripts": {
