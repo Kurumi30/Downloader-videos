@@ -3,7 +3,9 @@ import ytdl from 'ytdl-core'
 import rl from 'readline'
 import chalk from 'chalk'
 
-const logo = `
+const clearScreen = () => console.clear()
+const displayLogo = () => {
+    const logo = `
 __     _________   _____                      _                 _ 
 \\ \\   / /__   __| |  __ \\                    | |               | |
  \\ \\_/ /   | |    | |  | | _____      ___ __ | | ___   __ _  __| |
@@ -12,14 +14,11 @@ __     _________   _____                      _                 _
    |_|     |_|    |_____/ \\___/ \\_/\\_/ |_| |_|_|\\___/ \\__,_|\\__,_|
 
 `
-
-const banner = () => {
-    console.clear()
-    console.log(logo)
+    console.log(colorTheme(logo, "red"))
 }
 
-function colorTheme(text) {
-    const log = chalk.rgb(123, 45, 67).bold(text)
+function colorTheme(text, color) {
+    return chalk[color](text)
 }
 
 const readline = rl.createInterface({
@@ -28,38 +27,44 @@ const readline = rl.createInterface({
 })
 
 async function main() {
-    banner()
+    clearScreen()
+    displayLogo()
 
-    console.log(`
-    Escolha uma opção abaixo:
+
+    console.log(colorTheme(
+        `Escolha uma opção abaixo:
 
     [1] - Download usando o link
-    [0] - Cancelar
-    `)
+    [0] - Cancelar/Sair
+    `, "green"))
 
-    readline.question(`
-    Opção selecionada: `, (option => {
-        switch (Number(option)) {
-            case 1: {
-                banner()
+    readline.question(colorTheme(
+        `Opção selecionada: `, "blue"), (option => {
+            switch (Number(option)) {
+                case 1: {
+                    clearScreen()
+                    displayLogo()
 
-                readline.question(`
-    URL do vídeo: `, async (video) => {
-                    const data = await ytdl.getInfo(video).catch(() => {
+                    readline.question(colorTheme(
+                        `
+    URL do vídeo: `, "yellow"
+                    ), async (video) => {
+                        const data = await ytdl.getInfo(video).catch(() => {
 
-                        setTimeout(() => {
-                            readline.close()
-                            main()
-                        }, 6000)
-                    })
-                    banner()
+                            setTimeout(() => {
+                                readline.close()
+                                main()
+                            }, 6000)
+                        })
+                        clearScreen()
+                        displayLogo()
 
-                    const title = data.videoDetails.title
-                    const lengthSeconds = data.videoDetails.lengthSeconds
+                        const title = data.videoDetails.title
+                        const lengthSeconds = data.videoDetails.lengthSeconds
 
-                    if (videoDetails == undefined) return console.log("URL inválida, tente novamente!")
+                        // if (videoDetails == undefined) return console.log("URL inválida, tente novamente!")
 
-                    readline.question(`
+                        readline.question(`
     Vídeo: "${title}"
     Duração: ${lengthSeconds} segundos
 
@@ -69,100 +74,106 @@ async function main() {
     [2] - MP3
 
     Opção selecionada: `, option => {
-                        switch (Number(option)) {
-                            case 1: {
-                                ytdl(video, {
-                                    quality: 'highestvideo',
-                                    format: 'mp4'
-                                })
-                                    .on("progress", (total, downloadedSize, totalSize) => {
-                                        let progress = (downloadedSize / totalSize) * 100
+                            switch (Number(option)) {
+                                case 1: {
+                                    ytdl(video, {
+                                        quality: 'highestvideo',
+                                        format: 'mp4'
+                                    })
+                                        .on("progress", (total, downloadedSize, totalSize) => {
+                                            let progress = (downloadedSize / totalSize) * 100
 
-                                        banner()
+                                            clearScreen()
+                                            displayLogo()
 
-                                        console.log(`
+                                            console.log(`
     Baixando... [ ${progress.toFixed(2)}% ]
                                     `)
+                                        })
+                                        .on("error", (e => {
+                                            clearScreen()
+                                            displayLogo()
+
+                                            fs.unlinkSync(`./videos/${title.replace(
+                                                new RegExp('\\\\|/|\\|', 'g'), '-'
+                                            )}.mp4`)
+
+                                            console.log("Houve um erro ao tentar baixar o arquivo... :(")
+                                        }))
+                                        .on("end", () => {
+                                            clearScreen()
+                                            displayLogo()
+
+                                            console.log("O vídeo foi baixado com sucesso! :)")
+
+                                            readline.close()
+                                        })
+                                        .pipe(
+                                            fs.createWriteStream(`./videos/${title.replace(
+                                                new RegExp('\\\\|/|\\|', 'g'), '-'
+                                            )}.mp4`)
+                                        )
+                                    break
+                                }
+
+                                case 2: {
+                                    ytdl(video, {
+                                        filter: 'audioonly',
+                                        quality: 'highestaudio',
+                                        format: 'mp3'
                                     })
-                                    .on("error", (e => {
-                                        banner()
+                                        .on("progress", (total, downloadedSize, totalSize) => {
+                                            let progress = (downloadedSize / totalSize) * 100
 
-                                        fs.unlinkSync(`./videos/${title.replace(
-                                            new RegExp('\\\\|/|\\|', 'g'), '-'
-                                        )}.mp4`)
+                                            clearScreen()
+                                            displayLogo()
 
-                                        console.log("Houve um erro ao tentar baixar o arquivo... :(")
-                                    }))
-                                    .on("end", () => {
-                                        banner()
-
-                                        console.log("O vídeo foi baixado com sucesso! :)")
-
-                                        readline.close()
-                                    })
-                                    .pipe(
-                                        fs.createWriteStream(`./videos/${title.replace(
-                                            new RegExp('\\\\|/|\\|', 'g'), '-'
-                                        )}.mp4`)
-                                    )
-                                break
-                            }
-
-                            case 2: {
-                                ytdl(video, {
-                                    filter: 'audioonly',
-                                    quality: 'highestaudio',
-                                    format: 'mp3'
-                                })
-                                    .on("progress", (total, downloadedSize, totalSize) => {
-                                        let progress = (downloadedSize / totalSize) * 100
-
-                                        banner()
-
-                                        console.log(`
+                                            console.log(`
     Baixando... [ ${progress.toFixed(2)}% ]
                                     `)
-                                    })
-                                    .on("error", (e => {
-                                        banner()
+                                        })
+                                        .on("error", (e => {
+                                            clearScreen()
+                                            displayLogo()
 
-                                        fs.unlinkSync(`./audios/${title.replace(
-                                            new RegExp('\\\\|/|\\|', 'g'), '-'
-                                        )}.mp4`)
+                                            fs.unlinkSync(`./audios/${title.replace(
+                                                new RegExp('\\\\|/|\\|', 'g'), '-'
+                                            )}.mp4`)
 
-                                        console.log("Houve um erro ao tentar baixar o arquivo... :(")
-                                    }))
-                                    .on("end", () => {
-                                        banner()
+                                            console.log("Houve um erro ao tentar baixar o arquivo... :(")
+                                        }))
+                                        .on("end", () => {
+                                            clearScreen()
+                                            displayLogo()
 
-                                        console.log("O áudio foi baixado com sucesso! :)")
+                                            console.log("O áudio foi baixado com sucesso! :)")
 
-                                        readline.close()
-                                    })
-                                    .pipe(
-                                        fs.createWriteStream(`./audios/${title.replace(
-                                            new RegExp('\\\\|/|\\|', 'g'), '-'
-                                        )}.mp3`)
-                                    )
-                                break
+                                            readline.close()
+                                        })
+                                        .pipe(
+                                            fs.createWriteStream(`./audios/${title.replace(
+                                                new RegExp('\\\\|/|\\|', 'g'), '-'
+                                            )}.mp3`)
+                                        )
+                                    break
+                                }
                             }
-                        }
+                        })
                     })
-                })
-                break
-            }
+                    break
+                }
 
-            case 0: {
-                readline.close()
-                break
-            }
+                case 0: {
+                    readline.close()
+                    break
+                }
 
-            default: {
-                readline.close()
-                // main()
+                default: {
+                    readline.close()
+                    // main()
+                }
             }
-        }
-    }))
+        }))
 }
 
 main()
