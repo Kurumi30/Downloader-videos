@@ -3,6 +3,12 @@ import ytdl from 'ytdl-core'
 import rl from 'readline'
 import chalk from 'chalk'
 
+const infoMessage = {
+    invalidURL: "URL inválida, tente novamente!",
+    errorDownload: "Houve um erro ao tentar baixar o arquivo... :(",
+    successVideoDownload: "O vídeo foi baixado com sucesso! :)",
+    successAudioDownload: "O áudio foi baixado com sucesso! :)"
+}
 const clearScreen = () => console.clear()
 const displayLogo = () => {
     const logo = `
@@ -49,19 +55,19 @@ async function main() {
     URL do vídeo: `, "yellow"
                     ), async (video) => {
                         const data = await ytdl.getInfo(video).catch(() => {
-
                             setTimeout(() => {
                                 readline.close()
                                 main()
                             }, 6000)
                         })
+
                         clearScreen()
                         displayLogo()
 
                         const title = data.videoDetails.title
                         const lengthSeconds = data.videoDetails.lengthSeconds
 
-                        // if (videoDetails == undefined) return console.log("URL inválida, tente novamente!")
+                        // if (!data.videoDetails) return console.log("URL inválida, tente novamente!")
 
                         readline.question(`
     Vídeo: "${title}"
@@ -97,13 +103,13 @@ async function main() {
                                                 new RegExp('\\\\|/|\\|', 'g'), '-'
                                             )}.mp4`)
 
-                                            console.log("Houve um erro ao tentar baixar o arquivo... :(")
+                                            console.log(infoMessage.errorDownload)
                                         }))
                                         .on("end", () => {
                                             clearScreen()
                                             displayLogo()
 
-                                            console.log("O vídeo foi baixado com sucesso! :)")
+                                            console.log(infoMessage.successVideoDownload)
 
                                             readline.close()
                                         })
@@ -139,13 +145,13 @@ async function main() {
                                                 new RegExp('\\\\|/|\\|', 'g'), '-'
                                             )}.mp4`)
 
-                                            console.log("Houve um erro ao tentar baixar o arquivo... :(")
+                                            console.log(infoMessage.errorDownload)
                                         }))
                                         .on("end", () => {
                                             clearScreen()
                                             displayLogo()
 
-                                            console.log("O áudio foi baixado com sucesso! :)")
+                                            console.log(infoMessage.successAudioDownload)
 
                                             readline.close()
                                         })
