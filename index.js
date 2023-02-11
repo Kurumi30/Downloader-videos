@@ -9,9 +9,7 @@ const infoMessage = {
     successVideoDownload: "O vídeo foi baixado com sucesso! :)",
     successAudioDownload: "O áudio foi baixado com sucesso! :)"
 }
-const clearScreen = () => console.clear()
-const displayLogo = () => {
-    const logo = `
+const logo = `
 __     _________   _____                      _                 _ 
 \\ \\   / /__   __| |  __ \\                    | |               | |
  \\ \\_/ /   | |    | |  | | _____      ___ __ | | ___   __ _  __| |
@@ -20,8 +18,8 @@ __     _________   _____                      _                 _
    |_|     |_|    |_____/ \\___/ \\_/\\_/ |_| |_|_|\\___/ \\__,_|\\__,_|
 
 `
-    console.log(colorTheme(logo, "red"))
-}
+const clearScreen = () => console.clear()
+const displayLogo = () => console.log(colorTheme(logo, "red"))
 
 function colorTheme(text, color) {
     return chalk[color](text)
@@ -53,21 +51,26 @@ async function main() {
                     readline.question(colorTheme(
                         `
     URL do vídeo: `, "yellow"
-                    ), async (video) => {
-                        const data = await ytdl.getInfo(video).catch(() => {
+                    ), async function getData(video) {
+                        try {
+                            const data = await ytdl.getInfo(video)
+                            return {
+                                title: data.videoDetails.title,
+                                lengthSeconds: data.videoDetails.lengthSeconds
+                            }
+                        } catch (e) {
+                            console.log(infoMessage.invalidURL)
+                            console.error(e)
+
                             setTimeout(() => {
                                 readline.close()
                                 main()
-                            }, 6000)
-                        })
+                            }, 2000)
+                        }
+                        const { title, lengthSeconds } = await getData(video)
 
                         clearScreen()
                         displayLogo()
-
-                        const title = data.videoDetails.title
-                        const lengthSeconds = data.videoDetails.lengthSeconds
-
-                        // if (!data.videoDetails) return console.log("URL inválida, tente novamente!")
 
                         readline.question(`
     Vídeo: "${title}"
@@ -83,7 +86,7 @@ async function main() {
                                 case 1: {
                                     ytdl(video, {
                                         quality: 'highestvideo',
-                                        format: 'mp4'
+                                        // format: 'mp4'
                                     })
                                         .on("progress", (total, downloadedSize, totalSize) => {
                                             let progress = (downloadedSize / totalSize) * 100
