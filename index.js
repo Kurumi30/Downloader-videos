@@ -4,7 +4,7 @@ import rl from 'readline'
 import chalk from 'chalk'
 
 const infoMessage = {
-    invalidURL: "URL inválida, tente novamente!",
+    invalidURL: "URL inválida, tente novamente! ;-;",
     errorDownload: "Houve um erro ao tentar baixar o arquivo... :(",
     successVideoDownload: "O vídeo foi baixado com sucesso! :)",
     successAudioDownload: "O áudio foi baixado com sucesso! :)"
@@ -19,7 +19,7 @@ __     _________   _____                      _                 _
 
 `
 const clearScreen = () => console.clear()
-const displayLogo = () => console.log(colorTheme(logo, "red"))
+const displayLogo = (​​​​) => ​console.log(colorTheme(logo, "red"))
 
 function colorTheme(text, color) {
     return chalk[color](text)
@@ -42,25 +42,24 @@ async function main() {
     `, "green"))
 
     readline.question(colorTheme(
-        `Opção selecionada: `, "blue"), (option => {
+    `Opção selecionada: `, "blue"), (option => {
             switch (Number(option)) {
                 case 1: {
                     clearScreen()
                     displayLogo()
 
                     readline.question(colorTheme(
-                        `
-    URL do vídeo: `, "yellow"
+    `URL do vídeo: `, "yellow"
                     ), async function getData(video) {
                         try {
                             const data = await ytdl.getInfo(video)
+
                             return {
                                 title: data.videoDetails.title,
                                 lengthSeconds: data.videoDetails.lengthSeconds
                             }
-                        } catch (e) {
+                        } catch {
                             console.log(infoMessage.invalidURL)
-                            console.error(e)
 
                             setTimeout(() => {
                                 readline.close()
@@ -84,10 +83,7 @@ async function main() {
     Opção selecionada: `, option => {
                             switch (Number(option)) {
                                 case 1: {
-                                    ytdl(video, {
-                                        quality: 'highestvideo',
-                                        // format: 'mp4'
-                                    })
+                                    ytdl(video)
                                         .on("progress", (total, downloadedSize, totalSize) => {
                                             let progress = (downloadedSize / totalSize) * 100
 
