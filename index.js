@@ -19,7 +19,7 @@ __     _________   _____                      _                 _
 
 `
 const clearScreen = () => console.clear()
-const displayLogo = (​​​​) => ​console.log(colorTheme(logo, "red"))
+const displayLogo = () => console.log(colorTheme(logo, "red"))
 
 function colorTheme(text, color) {
     return chalk[color](text)
@@ -51,9 +51,9 @@ async function main() {
                     readline.question(colorTheme(
     `URL do vídeo: `, "yellow"
                     ), async function getData(video) {
+                        const data = await ytdl.getInfo(video)
+                        
                         try {
-                            const data = await ytdl.getInfo(video)
-
                             return {
                                 title: data.videoDetails.title,
                                 lengthSeconds: data.videoDetails.lengthSeconds
