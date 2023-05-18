@@ -11,7 +11,7 @@ const message = {
 // https://youtu.be/gtpCl_QWaLg
 
 function print(text, method = "log") {
-   if(!console[method]) {
+   if (!console[method]) {
       console.error("O método de console não existe!")
       return
    }
@@ -26,9 +26,15 @@ async function delay(time) {
    })
 }
 
+function setDate(date) {
+   let [year, month, day] = date.split("-")
+
+   return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`
+}
+
 const test = async () => {
-   let regex = new RegExp(/(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtube\.com|youtu.be)\/(?:watch\?v=|shorts\/)?([^\s]+)/)
    let getLink = process.argv[2] || null
+   let regex = new RegExp(/(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtube\.com|youtu.be)\/(?:watch\?v=|shorts\/)?([^\s]+)/)
 
    if (!regex.test(getLink) || getLink == "" || !getLink) {
       print(message.invalidURL, "error")
@@ -39,14 +45,9 @@ const test = async () => {
       const { videoDetails, formats } = await ytdl.getInfo(getLink)
       const { title, ownerChannelName, lengthSeconds, viewCount, publishDate, likes } = videoDetails
 
-      function setDate(date) {
-         let [year, month, day] = date.split("-")
-
-         return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`
-      }
-
       let views = parseInt(viewCount, 10).toLocaleString("pt-BR")
       let like = likes.toLocaleString("pt-BR")
+      let date = setDate(publishDate)
       const options = {
          filter: "audioandvideo",
          quality: "highest",
@@ -60,26 +61,26 @@ const test = async () => {
          print("O vídeo já existe!", "warn")
          return
       } else {
-         print("Baixando o vídeo...")
+         print("Obtendo as informações do vídeo...")
       }
 
       //Reescrever essa merda
       ytdl(getLink, options)
          .pipe(fs.createWriteStream(filePath))
          .on("finish", async () => {
-            print("Obtendo as informações do vídeo...")
+            print("Baixando o vídeo...")
+
+            await delay(2000)
+
             print(`
             Dados do arquivo:
       - Título: ${title}
       - Canal: ${ownerChannelName}
       - Duração: ${lengthSeconds} segundos
       - Visualizações: ${views}
-      - Data de publicação: ${setDate(publishDate)}
+      - Data de publicação: ${date}
       - Likes: ${like}
          `)
-
-            await delay(1000)
-
             print(message.successVideoDownload)
          })
          .on("error", (err) => {
