@@ -1,3 +1,8 @@
+/*
+ * Adicionar a qualidade do vídeo
+ * Converter mp4 para mp3 usando ffmpeg
+*/
+
 const ytdl = require("@distube/ytdl-core")
 const fs = require("fs")
 const path = require("path")
@@ -42,37 +47,38 @@ const test = async () => {
    }
 
    try {
-      const { videoDetails, formats } = await ytdl.getInfo(getLink)
-      const { title, ownerChannelName, lengthSeconds, viewCount, publishDate, likes } = videoDetails
+      await ytdl.getInfo(getLink).then(async (info) => {
+         const { videoDetails, formats } = info
+         const { title, ownerChannelName, lengthSeconds, viewCount, publishDate, likes } = videoDetails
 
-      let views = parseInt(viewCount, 10).toLocaleString("pt-BR")
-      let like = likes.toLocaleString("pt-BR")
-      let date = setDate(publishDate)
-      const options = {
-         filter: "audioandvideo",
-         quality: "highest",
-         format: "mp4",
-      }
+         let views = parseInt(viewCount, 10).toLocaleString("pt-BR")
+         let like = likes.toLocaleString("pt-BR")
+         let date = setDate(publishDate)
+         const options = {
+            filter: "audioandvideo",
+            quality: "highest",
+            format: "mp4",
+         }
 
-      const videoPath = path.resolve(__dirname, "videos")
-      const filePath = path.join(videoPath, `${title}.${formats[0].container}`)
+         const videoPath = path.resolve(__dirname, "videos")
+         const filePath = path.join(videoPath, `${title}.${formats[0].container}`)
 
-      if (fs.existsSync(filePath)) {
-         print("O vídeo já existe!", "warn")
-         return
-      } else {
-         print("Obtendo as informações do vídeo...")
-      }
+         if (fs.existsSync(filePath)) {
+            print("O vídeo já existe!", "warn")
+            return
+         } else {
+            print("Obtendo as informações do vídeo...")
+         }
 
-      //Reescrever essa merda
-      ytdl(getLink, options)
-         .pipe(fs.createWriteStream(filePath))
-         .on("finish", async () => {
-            print("Baixando o vídeo...")
+         const video = ytdl.downloadFromInfo(info, options)
 
-            await delay(2000)
+         video.pipe(fs.createWriteStream(filePath))
+            .on("finish", async () => {
+               print("Baixando o vídeo...")
 
-            print(`
+               await delay(2000)
+
+               print(`
             Dados do arquivo:
       - Título: ${title}
       - Canal: ${ownerChannelName}
@@ -81,11 +87,12 @@ const test = async () => {
       - Data de publicação: ${date}
       - Likes: ${like}
          `)
-            print(message.successVideoDownload)
-         })
-         .on("error", (err) => {
-            throw new Error(err)
-         })
+               print(message.successVideoDownload)
+            })
+            .on("error", (err) => {
+               throw new Error(err)
+            })
+      })
    } catch {
       print(message.errorDownload, "error")
       return
