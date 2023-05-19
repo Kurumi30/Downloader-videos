@@ -1,5 +1,6 @@
 /*
- * Adicionar a qualidade do vídeo
+ * <Adicionar a qualidade do vídeo>
+ * Remover o arquivo de vídeo após um certo período de tempo
  * Converter mp4 para mp3 usando ffmpeg
 */
 
@@ -13,7 +14,6 @@ const message = {
 }
 
 // TROLL: https://www.youtube.com/watch?v=dQw4w9WgXcQ
-// https://youtu.be/gtpCl_QWaLg
 
 function print(text, method = "log") {
    if (!console[method]) {
@@ -30,6 +30,18 @@ async function delay(time) {
       }, time)
    })
 }
+
+/* função para remover o arquivo após 1 minuto do download */
+
+// function removeFile(filePath) {
+//    fs.unlink(filePath, (err) => {
+//       if (err) {
+//          throw new Error(err)
+//       }
+//    })
+
+//    print("Arquivo removido com sucesso!")
+// }
 
 function setDate(date) {
    let [year, month, day] = date.split("-")
@@ -54,39 +66,43 @@ const test = async () => {
          let views = parseInt(viewCount, 10).toLocaleString("pt-BR")
          let like = likes.toLocaleString("pt-BR")
          let date = setDate(publishDate)
+
          const options = {
             filter: "audioandvideo",
-            quality: "highest",
-            format: "mp4",
+            format: "720p",
+            // quality: "hd720",
          }
 
          const videoPath = path.resolve(__dirname, "videos")
          const filePath = path.join(videoPath, `${title}.${formats[0].container}`)
 
-         if (fs.existsSync(filePath)) {
-            print("O vídeo já existe!", "warn")
-            return
-         } else {
-            print("Obtendo as informações do vídeo...")
-         }
-
          const video = ytdl.downloadFromInfo(info, options)
+
+         if (fs.existsSync(filePath)) {
+            print("O vídeo já existe na sua pasta!", "warn")
+            return
+         }
 
          video.pipe(fs.createWriteStream(filePath))
             .on("finish", async () => {
-               print("Baixando o vídeo...")
+               print("Obtendo as informações do vídeo...")
 
                await delay(2000)
 
                print(`
-            Dados do arquivo:
-      - Título: ${title}
-      - Canal: ${ownerChannelName}
-      - Duração: ${lengthSeconds} segundos
-      - Visualizações: ${views}
-      - Data de publicação: ${date}
-      - Likes: ${like}
+      Dados do arquivo:
+   - Título: ${title}
+   - Canal: ${ownerChannelName}
+   - Duração: ${lengthSeconds} segundos
+   - Visualizações: ${views}
+   - Data de publicação: ${date}
+   - Likes: ${like}
          `)
+
+               print("Baixando o vídeo...")
+
+               await delay(2000)
+
                print(message.successVideoDownload)
             })
             .on("error", (err) => {
