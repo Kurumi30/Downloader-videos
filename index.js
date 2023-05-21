@@ -1,7 +1,8 @@
 /*
  * <Adicionar a qualidade do vídeo>
- * Remover o arquivo de vídeo após um certo período de tempo
+ * <Remover o arquivo de vídeo após um certo período de tempo>
  * Converter mp4 para mp3 usando ffmpeg
+ * Melhorar na interface do console usando o chalk
 */
 
 const ytdl = require("@distube/ytdl-core")
@@ -30,18 +31,6 @@ async function delay(time) {
       }, time)
    })
 }
-
-/* função para remover o arquivo após 1 minuto do download */
-
-// function removeFile(filePath) {
-//    fs.unlink(filePath, (err) => {
-//       if (err) {
-//          throw new Error(err)
-//       }
-//    })
-
-//    print("Arquivo removido com sucesso!")
-// }
 
 function setDate(date) {
    let [year, month, day] = date.split("-")
@@ -116,3 +105,5 @@ const test = async () => {
 }
 
 test()
+
+module.exports = test
