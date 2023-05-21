@@ -8,29 +8,9 @@
 const ytdl = require("@distube/ytdl-core")
 const fs = require("fs")
 const path = require("path")
-const message = {
-   invalidURL: "URL inválida, tente novamente! ;-;",
-   errorDownload: "Houve um erro ao baixar o vídeo... :(",
-   successVideoDownload: "Vídeo baixado com sucesso! :D",
-}
+const { print, delay } = require("./main")
 
 // TROLL: https://www.youtube.com/watch?v=dQw4w9WgXcQ
-
-function print(text, method = "log") {
-   if (!console[method]) {
-      console.error("O método de console não existe!")
-      return
-   }
-   console[method](text)
-}
-
-async function delay(time) {
-   return new Promise(resolve => {
-      setTimeout(() => {
-         resolve()
-      }, time)
-   })
-}
 
 function setDate(date) {
    let [year, month, day] = date.split("-")
@@ -39,6 +19,12 @@ function setDate(date) {
 }
 
 const test = async () => {
+   const message = {
+      invalidURL: "URL inválida, tente novamente! ;-;",
+      errorDownload: "Houve um erro ao baixar o vídeo... :(",
+      successVideoDownload: "Vídeo baixado com sucesso! :D",
+   }
+
    let getLink = process.argv[2] || null
    let regex = new RegExp(/(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtube\.com|youtu.be)\/(?:watch\?v=|shorts\/)?([^\s]+)/)
 
@@ -106,4 +92,4 @@ const test = async () => {
 
 test()
 
-module.exports = test
+// module.exports = test

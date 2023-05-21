@@ -1,9 +1,10 @@
 const yts = require("yt-search")
+const { print, delay } = require("./main")
 
 async function search(/*param*/) {
    const search = process.argv.slice(2).join(" ") || null
 
-   if (!search) return console.log("Digite algo para pesquisar!")
+   if (!search) return print("Digite algo para pesquisar!")
 
    const info = await yts(search)
    const videos = info.videos.slice(0, 6)
@@ -23,8 +24,12 @@ async function search(/*param*/) {
       }
    })
 
+   print(`Buscando por: ${search}\n\n`)
+   
+   await delay(2000)
+
    list.forEach((item, index) => {
-      console.log(`${index + 1}-
+      print(`${index + 1}-
    => Título: ${item.title}
    => URL: ${item.url}
    => Canal: ${item.author}
@@ -37,4 +42,4 @@ async function search(/*param*/) {
 
 search()
 
-module.exports = search
+// module.exports = search
