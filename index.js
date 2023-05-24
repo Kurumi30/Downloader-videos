@@ -6,7 +6,7 @@
 */
 
 const ytdl = require("@distube/ytdl-core")
-const fs = require("fs")
+const { existsSync, createWriteStream } = require("fs")
 const path = require("path")
 const { print, delay } = require("./main")
 
@@ -53,12 +53,12 @@ const test = async () => {
 
          const video = ytdl.downloadFromInfo(info, options)
 
-         if (fs.existsSync(filePath)) {
+         if (existsSync(filePath)) {
             print("O vídeo já existe na sua pasta!", "warn")
             return
          }
 
-         video.pipe(fs.createWriteStream(filePath))
+         video.pipe(createWriteStream(filePath))
             .on("finish", async () => {
                print("Obtendo as informações do vídeo...")
 

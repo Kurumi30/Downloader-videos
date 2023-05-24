@@ -1,13 +1,13 @@
 const yts = require("yt-search")
 const { print, delay } = require("./main")
 
-async function search(/*param*/) {
+async function search() {
    const search = process.argv.slice(2).join(" ") || null
 
-   if (!search) return print("Digite algo para pesquisar!")
+   if (!search) return print("Digite algo para pesquisar!", "warn")
 
-   const info = await yts(search)
-   const videos = info.videos.slice(0, 6)
+   const data = await yts(search)
+   const videos = data.videos.slice(0, 6)
 
    let list = videos.map(video => {
       const { title, url, author, views, duration } = video
